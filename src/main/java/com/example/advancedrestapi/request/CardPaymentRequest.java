@@ -1,18 +1,18 @@
 package com.example.advancedrestapi.request;
 
-import com.example.advancedrestapi.model.CardCategory;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.*;
-import org.hibernate.validator.constraints.CreditCardNumber;
-import org.hibernate.validator.constraints.Range;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-
-public class PaymentCardRequest {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CardPaymentRequest {
 
 
     private Long Id;
