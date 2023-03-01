@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class CustomizedExceptionHandler {
+
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<ErrorDetails> handleAllExceptions(Exception ex, WebRequest request) throws Exception {
         ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(),
@@ -31,7 +32,7 @@ public class CustomizedExceptionHandler {
 
     }
 
-   // @Override
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
