@@ -12,8 +12,8 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "account_tbl",
+@Table(name = "accounts_tbl",
+
         uniqueConstraints = {
                 @UniqueConstraint(name = "email_unique",columnNames = "email"),
                 @UniqueConstraint(name = "Account_number_unique",columnNames = "accountNumber"),
@@ -21,10 +21,11 @@ import java.util.Date;
         }
 )
 @Builder
+@Entity
 public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private Long Id;
+    private Long id;
 
     @NotBlank
     @NotNull(message = "first name is required!!!!")
@@ -35,15 +36,18 @@ public class Account {
     private String lastName;
     @NotBlank
     @NotNull
+    @Column(unique = true)
     private String accountNumber;
     @Size(min = 10, max = 15, message = "please provide valid mobile number")
+    @Column(unique = true)
     private String mobileNumber;
     @Past(message = "date of birth should be past")
-    private Date DateOfBirth;
+    private Date dateOfBirth;
     @Email(regexp ="[A-Za-z0-9._%-+]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}",
             flags = Pattern.Flag.CASE_INSENSITIVE,
             message ="invalid email format"
     )
+    @Column(unique = true)
     private String email;
 
 

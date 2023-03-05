@@ -20,6 +20,6 @@ public class AccountRequest {
     private String lastName;
     private String accountNumber;
     private String mobileNumber;
-    private Date DateOfBirth;
+    private Date dateOfBirth;
     private String email;
 }
