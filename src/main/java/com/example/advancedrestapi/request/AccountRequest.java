@@ -21,5 +21,5 @@ public class AccountRequest {
     private String accountNumber;
     private String mobileNumber;
     private Date DateOfBirth;
-    private String emailNumber;
+    private String email;
 }

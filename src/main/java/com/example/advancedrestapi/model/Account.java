@@ -44,7 +44,7 @@ public class Account {
             flags = Pattern.Flag.CASE_INSENSITIVE,
             message ="invalid email format"
     )
-    private String emailNumber;
+    private String email;
 
 
 }
