@@ -22,8 +22,7 @@ public class AccountController {
 
     //adding account details to database
 
-    @PostMapping()
-
+                   @PostMapping()
     public ResponseEntity<Account>Save(@RequestBody AccountRequest accountRequest){
         return accountService.addAccount(accountRequest);
     }
