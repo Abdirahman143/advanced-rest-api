@@ -3,6 +3,7 @@ package com.example.advancedrestapi.controller;
 import com.example.advancedrestapi.model.Account;
 import com.example.advancedrestapi.request.AccountRequest;
 import com.example.advancedrestapi.service.AccountService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,7 +24,7 @@ public class AccountController {
     //adding account details to database
 
                    @PostMapping()
-    public ResponseEntity<Account>Save(@RequestBody AccountRequest accountRequest){
+    public ResponseEntity<Account>Save(@RequestBody @Valid AccountRequest accountRequest){
         return accountService.addAccount(accountRequest);
     }
 }
