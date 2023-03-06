@@ -1,14 +1,18 @@
 package com.example.advancedrestapi.controller;
 
+import com.example.advancedrestapi.customException.UserNotFoundException;
 import com.example.advancedrestapi.model.Account;
 import com.example.advancedrestapi.request.AccountRequest;
+import com.example.advancedrestapi.response.AccountResponse;
 import com.example.advancedrestapi.service.AccountService;
+import jakarta.persistence.GeneratedValue;
 import jakarta.validation.Valid;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/accounts")
@@ -27,4 +31,21 @@ public class AccountController {
     public ResponseEntity<Account>Save(@RequestBody @Valid AccountRequest accountRequest){
         return accountService.addAccount(accountRequest);
     }
+
+
+    @GetMapping()
+    public ResponseEntity<List<AccountResponse>>getAccounts(){
+        return accountService.getAllAccounts();
+    }
+
+
+    //get Accounts details by Id
+
+    @GetMapping("/{id}")
+
+    public Optional<AccountResponse>getAccountsById(
+            @PathVariable(value = "id")Long id) throws UserNotFoundException {
+        return accountService.getAccountById(id);
+    }
+
 }
