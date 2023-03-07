@@ -17,4 +17,7 @@ public interface AccountService {
 
     //getting single account by Id
     Optional<AccountResponse> getAccountById(Long id) throws UserNotFoundException;
+
+    //find account by Account Number
+    Optional<AccountResponse>findByAccountNumber(String accountNumber) throws UserNotFoundException;
 }

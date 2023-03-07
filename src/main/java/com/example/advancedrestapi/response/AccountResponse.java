@@ -11,7 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AccountResponse {
+public class AccountResponse{
     private Long id;
     private String firstName;
     private String middleName;
