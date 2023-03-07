@@ -48,4 +48,11 @@ public class AccountController {
         return accountService.getAccountById(id);
     }
 
+
+    @GetMapping("/{account-number}")
+    public Optional<AccountResponse>getAccountsByAccountNumber(
+            @Param("account-number")String accountNumber) throws UserNotFoundException {
+        return accountService.findByAccountNumber(accountNumber);
+    }
+
 }

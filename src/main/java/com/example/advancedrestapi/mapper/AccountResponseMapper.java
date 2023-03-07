@@ -1,9 +1,16 @@
 package com.example.advancedrestapi.mapper;
 
+import com.example.advancedrestapi.customException.UserNotFoundException;
 import com.example.advancedrestapi.model.Account;
+import com.example.advancedrestapi.repository.AccountRepository;
 import com.example.advancedrestapi.response.AccountResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class AccountResponseMapper {
+import java.util.Optional;
+
+public class AccountResponseMapper{
+    @Autowired
+    private AccountRepository accountRepository;
 
    public static AccountResponse MapToResponse(Account account) {
         return  AccountResponse.
@@ -17,4 +24,7 @@ public class AccountResponseMapper {
                 dateOfBirth(account.getDateOfBirth()).
                 build();
     }
+
+
+
 }

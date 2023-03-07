@@ -75,4 +75,27 @@ public class AccountServiceImpl implements AccountService {
 
     }
 
+    //find account by Account Number
+    @Override
+    public Optional<AccountResponse>findByAccountNumber(String accountNumber) throws UserNotFoundException {
+             Optional<Account>account = accountRepository.findByAccountNumber(accountNumber);
+        AccountResponse accountResponse = AccountResponse.
+                builder().
+                id(account.get().getId()).
+                firstName(account.get().getFirstName()).
+                middleName(account.get().getMiddleName()).
+                lastName(account.get().getLastName()).
+                email(account.get().getEmail()).
+                mobileNumber(account.get().getMobileNumber()).
+                accountNumber(account.get().getAccountNumber()).
+                dateOfBirth(account.get().getDateOfBirth()).
+                build();
+        if(account!=null){
+            return Optional.ofNullable(accountResponse);
+        }else{
+            throw new UserNotFoundException("the account number is not found"+accountNumber);
+        }
+
+    }
+
 }
