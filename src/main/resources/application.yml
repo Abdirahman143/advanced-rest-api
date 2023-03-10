@@ -1,3 +1,24 @@
+<<<<<<< HEAD
+server:
+  port: 9090
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/account_service_db
+    username: root
+    password: abdi
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+        hibernate:
+          format_sql: true
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+=======
 #spring:
 #  datasource:
 #    driver-class-name: com.mysql.cj.jdbc.Driver
@@ -11,3 +32,4 @@
 #    properties:
 #        hibernate:
 #          format_sql: true
+>>>>>>> ac65e5919d77284925ad7dbc499754921f5b5564
