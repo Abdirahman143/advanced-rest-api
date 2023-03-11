@@ -16,6 +16,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/accounts")
+//@BasePathAwareController
 public class AccountController {
 
     private final AccountService accountService;
