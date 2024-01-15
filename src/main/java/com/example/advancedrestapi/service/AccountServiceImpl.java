@@ -53,7 +53,7 @@ public class AccountServiceImpl implements AccountService {
        public Optional<AccountResponse>findAccountDetails(String accountNumber, String email){
              Optional<Account>accountOptional = accountRepository.findAccountDetails(accountNumber,email);
              if(!accountOptional.isPresent()){
-                 throw new UserNotFoundException("Account number and email " + accountNumber +","+email+ " not found. Please try with a valid ID.");
+                 throw new UserNotFoundException("account number"+accountNumber+"and email"+email+"not found. Please try with a valid account number and email.");
              }
              Account account = accountOptional.get();
              AccountResponse accountResponse = AccountResponse
@@ -67,6 +67,33 @@ public class AccountServiceImpl implements AccountService {
                      build();
              return Optional.of(accountResponse);
        }
+
+public ResponseEntity<AccountResponse>UpdateAccountDetails(AccountRequest accountRequest,
+                                                           String accountNumber,
+                                                           String email){
+             Optional<Account>accountOptional = accountRepository.findAccountDetails(accountNumber,email);
+             if(!accountOptional.isPresent()){
+                 throw new UserNotFoundException("account number"+accountNumber+"and email"+email+"not found. Please try with a valid account number and email.");
+             }
+
+             Account existingAccount = accountOptional.get();
+             updateAccountDetails(existingAccount,accountRequest);
+             Account updatedAccount = accountRepository.save(existingAccount);
+             AccountResponse accountResponse = AccountResponseMapper.MapToResponse(updatedAccount);
+
+             return new ResponseEntity<>(accountResponse, HttpStatus.OK);
+
+
+}
+
+//this method updates the account details
+public void updateAccountDetails(Account existingAccount, AccountRequest accountRequest){
+             existingAccount.setFirstName(accountRequest.getFirstName());
+             existingAccount.setMiddleName(accountRequest.getMiddleName());
+             existingAccount.setLastName(accountRequest.getLastName());
+             existingAccount.setMobileNumber(accountRequest.getMobileNumber());
+             existingAccount.setDateOfBirth(accountRequest.getDateOfBirth());
+}
 
 
 }
