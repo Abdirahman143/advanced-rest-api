@@ -50,52 +50,23 @@ public class AccountServiceImpl implements AccountService {
 
        }
 
+       public Optional<AccountResponse>findAccountDetails(String accountNumber, String email){
+             Optional<Account>accountOptional = accountRepository.findAccountDetails(accountNumber,email);
+             if(!accountOptional.isPresent()){
+                 throw new UserNotFoundException("Account number and email " + accountNumber +","+email+ " not found. Please try with a valid ID.");
+             }
+             Account account = accountOptional.get();
+             AccountResponse accountResponse = AccountResponse
+                     .builder().
+                     id(account.getId()).
+                     firstName(account.getFirstName()).
+                     middleName(account.getMiddleName()).
+                     email(account.getEmail()).
+                     accountNumber(account.getAccountNumber()).
+                     mobileNumber(account.getMobileNumber()).
+                     build();
+             return Optional.of(accountResponse);
+       }
 
-       @Override
-       //getting single account by Id
-    public Optional<AccountResponse>getAccountById(Long id) throws UserNotFoundException {
-             Optional<Account> account = accountRepository.findById(id);
-                 AccountResponse accountResponse = AccountResponse.
-                         builder().
-                         id(account.get().getId()).
-                         firstName(account.get().getFirstName()).
-                         middleName(account.get().getMiddleName()).
-                         lastName(account.get().getLastName()).
-                         email(account.get().getEmail()).
-                         mobileNumber(account.get().getMobileNumber()).
-                         accountNumber(account.get().getAccountNumber()).
-                         dateOfBirth(account.get().getDateOfBirth()).
-                         build();
-
-                 if(account!=null){
-                     return  Optional.ofNullable(accountResponse);
-                 }else{
-                     throw new  UserNotFoundException("the Id"+id+"not found please try with valid Id");
-                 }
-
-    }
-
-    //find account by Account Number
-    @Override
-    public Optional<AccountResponse>findByAccountNumber(String accountNumber) throws UserNotFoundException {
-             Optional<Account>account = accountRepository.findByAccountNumber(accountNumber);
-        AccountResponse accountResponse = AccountResponse.
-                builder().
-                id(account.get().getId()).
-                firstName(account.get().getFirstName()).
-                middleName(account.get().getMiddleName()).
-                lastName(account.get().getLastName()).
-                email(account.get().getEmail()).
-                mobileNumber(account.get().getMobileNumber()).
-                accountNumber(account.get().getAccountNumber()).
-                dateOfBirth(account.get().getDateOfBirth()).
-                build();
-        if(account!=null){
-            return Optional.ofNullable(accountResponse);
-        }else{
-            throw new UserNotFoundException("the account number is not found"+accountNumber);
-        }
-
-    }
 
 }
