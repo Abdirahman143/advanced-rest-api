@@ -28,6 +28,7 @@ public interface AccountService {
                                                                  String accountNumber,
                                                                  String email);
 
+
     //Delete account by account Number;
-    String DeleteAccountDetails(String accountNumber, String email);
+    ResponseEntity<String> deleteAccountDetails(String accountNumber, String email);
 }
