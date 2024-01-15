@@ -2,6 +2,7 @@ package com.example.advancedrestapi.controller;
 
 import com.example.advancedrestapi.customException.UserNotFoundException;
 import com.example.advancedrestapi.model.Account;
+import com.example.advancedrestapi.request.AccountPartialUpdateRequest;
 import com.example.advancedrestapi.request.AccountRequest;
 import com.example.advancedrestapi.response.AccountResponse;
 import com.example.advancedrestapi.service.AccountService;
@@ -40,20 +41,40 @@ public class AccountController {
     }
 
 
-    //get Accounts details by Id
+    //get Accounts details by account number and email
 
-    @GetMapping("/{id}")
-
-    public Optional<AccountResponse>getAccountsById(
-            @PathVariable(value = "id")Long id) throws UserNotFoundException {
-        return accountService.getAccountById(id);
+    @GetMapping("/details")
+    public Optional<AccountResponse>getAccountDetails(@RequestParam(required = true)String accountNumber,
+                                                      @RequestParam(required = true)String email){
+        return accountService.findAccountDetails(accountNumber,email);
     }
 
+    //update account details
 
-    @GetMapping("/{account-number}")
-    public Optional<AccountResponse>getAccountsByAccountNumber(
-            @Param("account-number")String accountNumber) throws UserNotFoundException {
-        return accountService.findByAccountNumber(accountNumber);
+    @PutMapping()
+    public ResponseEntity<AccountResponse>updateAccountDetails(@RequestBody @Valid
+                                                               AccountRequest accountRequest,
+                                                               @RequestParam(required = true)String accountNumber,
+                                                               @RequestParam(required = true)String email){
+        return  accountService.UpdateAccountDetails(accountRequest,accountNumber,email);
+
+    }
+
+    @PatchMapping("/partial")
+    public ResponseEntity<AccountResponse>updateAccountPartially(
+            @RequestBody @Valid
+            AccountPartialUpdateRequest partialUpdateRequest,
+            @RequestParam String accountNumber,
+            @RequestParam String email
+    ){
+        return accountService.updateAccountDetailsPartially(partialUpdateRequest,accountNumber,email);
+    }
+
+//Delete account
+    @DeleteMapping
+    public ResponseEntity<String> deleteAccountDetails(@RequestParam String accountNumber,
+                                       @RequestParam String email){
+        return accountService.deleteAccountDetails(accountNumber,email);
     }
 
 }
