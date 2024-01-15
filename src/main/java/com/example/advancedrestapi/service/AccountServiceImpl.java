@@ -125,5 +125,15 @@ public void updateAccountDetails(Account existingAccount, AccountRequest account
         return new ResponseEntity<>(accountResponse,HttpStatus.OK);
     }
 
+//Delete account by account Number;
+@Override
+    public String DeleteAccountDetails(String accountNumber, String email){
+         Optional<Account>accountOptional=accountRepository.findAccountDetails(accountNumber,email) ;
+         if(!accountOptional.isPresent()){
+             throw new UserNotFoundException("account number"+accountNumber+"and email"+email+"not found. Please try with a valid account number and email.");
+         }
+         accountRepository.deleteByAccountNumber(accountNumber);
+        return "Account with account number " + accountNumber + " has been permanently deleted.";
 
+         }
 }
