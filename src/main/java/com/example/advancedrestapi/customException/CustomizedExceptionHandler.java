@@ -2,12 +2,15 @@ package com.example.advancedrestapi.customException;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.validation.ConstraintViolationException;
-
 //import org.hibernate.exception.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -26,6 +29,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class CustomizedExceptionHandler extends ResponseEntityExceptionHandler {
+
 
     // handleHttpMediaTypeNotSupported : triggers when the JSON is invalid
     @Override
@@ -70,8 +74,30 @@ public class CustomizedExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException ex, WebRequest request) {
+        String message = extractConstraintViolationMessage(ex);
+        ApiError apiError = new ApiError(LocalDateTime.now(), HttpStatus.BAD_REQUEST, "Data Integrity Error", Collections.singletonList(message));
+        return ResponseEntityBuilder.build(apiError);
+    }
 
+    private String extractConstraintViolationMessage(DataIntegrityViolationException ex) {
+        Pattern pattern = Pattern.compile("constraint \\[([\\w_]+)\\]");
+        Matcher matcher = pattern.matcher(ex.getMessage());
 
+        if (matcher.find()) {
+            String constraintName = matcher.group(1);
+            switch (constraintName) {
+                case "uk_6hd8egpq0b53frw3m3kibtc5d":
+                    return "An entity with the same identifier (e.g., employee ID or email) already exists.";
+                case "uk_ele2pby24o1hxt8q90l3cwv56":
+                    return "Another entity constraint (e.g., unique employee Id ) violation occurred.";
+                default:
+                    return "Operation cannot be performed due to a data integrity violation.";
+            }
+        }
+        return "Operation cannot be performed due to a data integrity violation.";
+    }
 
 
     // handleMethodArgumentNotValid : triggers when @Valid fails
@@ -83,7 +109,7 @@ public class CustomizedExceptionHandler extends ResponseEntityExceptionHandler {
             WebRequest request) {
 
 
-    List<String> details = new ArrayList<String>();
+        List<String> details = new ArrayList<String>();
         details = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -97,6 +123,7 @@ public class CustomizedExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntityBuilder.build(err);
     }
+
 
     // handleMissingServletRequestParameter : triggers when there are missing parameters
     @Override
@@ -128,7 +155,7 @@ public class CustomizedExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
 
-  // handleConstraintViolationException : triggers when @Validated fails
+    // handleConstraintViolationException : triggers when @Validated fails
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<?> handleConstraintViolationException(Exception ex, WebRequest request) {
 
@@ -139,19 +166,6 @@ public class CustomizedExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntityBuilder.build(err);
     }
-
-    // handleResourceNotFoundException : triggers when there is not resource with the specified ID in BDD
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Object> handleResourceNotFoundException(UserNotFoundException ex) {
-
-        List<String> details = new ArrayList<String>();
-        details.add(ex.getMessage());
-
-        ApiError err = new ApiError(LocalDateTime.now(),HttpStatus.NOT_FOUND, "Resource Not Found" ,details);
-
-        return ResponseEntityBuilder.build(err);
-    }
-
 
 
     // handleNoHandlerFoundException : triggers when the handler method is invalid
@@ -184,6 +198,16 @@ public class CustomizedExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex, WebRequest request) {
+        ApiError apiError = new ApiError(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND,
+                "Resource Not Found",
+                Collections.singletonList(ex.getMessage())
+        );
+        return ResponseEntityBuilder.build(apiError);
+    }
 
 
 }
