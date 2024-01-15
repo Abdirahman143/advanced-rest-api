@@ -51,6 +51,9 @@ public class AccountServiceImpl implements AccountService {
 
        }
 
+
+       //find employee details by email and account number
+    @Override
        public Optional<AccountResponse>findAccountDetails(String accountNumber, String email){
              Optional<Account>accountOptional = accountRepository.findAccountDetails(accountNumber,email);
              if(!accountOptional.isPresent()){
@@ -70,7 +73,7 @@ public class AccountServiceImpl implements AccountService {
        }
 
        //updating the account details
-
+       @Override
 public ResponseEntity<AccountResponse>UpdateAccountDetails(AccountRequest accountRequest,
                                                            String accountNumber,
                                                            String email){
@@ -101,8 +104,8 @@ public void updateAccountDetails(Account existingAccount, AccountRequest account
 
 //partial update the account details
 
-
-    public ResponseEntity<AccountResponse>updateAccountDetailsPartially( AccountPartialUpdateRequest partialUpdateRequest,
+@Override
+    public ResponseEntity<AccountResponse>updateAccountDetailsPartially(AccountPartialUpdateRequest partialUpdateRequest,
                                                                         String accountNumber,
                                                                         String email){
              Optional<Account>accountOptional = accountRepository.findAccountDetails(accountNumber,email);
