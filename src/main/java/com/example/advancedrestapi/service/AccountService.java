@@ -27,4 +27,7 @@ public interface AccountService {
     ResponseEntity<AccountResponse>updateAccountDetailsPartially(AccountPartialUpdateRequest partialUpdateRequest,
                                                                  String accountNumber,
                                                                  String email);
+
+    //Delete account by account Number;
+    String DeleteAccountDetails(String accountNumber, String email);
 }
