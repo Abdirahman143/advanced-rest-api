@@ -4,6 +4,7 @@ import com.example.advancedrestapi.customException.UserNotFoundException;
 import com.example.advancedrestapi.mapper.AccountResponseMapper;
 import com.example.advancedrestapi.model.Account;
 import com.example.advancedrestapi.repository.AccountRepository;
+import com.example.advancedrestapi.request.AccountPartialUpdateRequest;
 import com.example.advancedrestapi.request.AccountRequest;
 import com.example.advancedrestapi.response.AccountResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,9 @@ public class AccountServiceImpl implements AccountService {
 
        }
 
+
+       //find employee details by email and account number
+    @Override
        public Optional<AccountResponse>findAccountDetails(String accountNumber, String email){
              Optional<Account>accountOptional = accountRepository.findAccountDetails(accountNumber,email);
              if(!accountOptional.isPresent()){
@@ -68,6 +72,8 @@ public class AccountServiceImpl implements AccountService {
              return Optional.of(accountResponse);
        }
 
+       //updating the account details
+       @Override
 public ResponseEntity<AccountResponse>UpdateAccountDetails(AccountRequest accountRequest,
                                                            String accountNumber,
                                                            String email){
@@ -94,6 +100,30 @@ public void updateAccountDetails(Account existingAccount, AccountRequest account
              existingAccount.setMobileNumber(accountRequest.getMobileNumber());
              existingAccount.setDateOfBirth(accountRequest.getDateOfBirth());
 }
+
+
+//partial update the account details
+
+@Override
+    public ResponseEntity<AccountResponse>updateAccountDetailsPartially(AccountPartialUpdateRequest partialUpdateRequest,
+                                                                        String accountNumber,
+                                                                        String email){
+             Optional<Account>accountOptional = accountRepository.findAccountDetails(accountNumber,email);
+        if(!accountOptional.isPresent()){
+            throw new UserNotFoundException("account number"+accountNumber+"and email"+email+"not found. Please try with a valid account number and email.");
+
+        }
+        Account existingAccount = accountOptional.get();
+        if(partialUpdateRequest.getMobileNumber()!=null){
+            existingAccount.setMobileNumber(partialUpdateRequest.getMobileNumber());
+        }
+        if(partialUpdateRequest.getDateOfBirth()!=null){
+            existingAccount.setDateOfBirth(partialUpdateRequest.getDateOfBirth());
+        }
+        Account updatedAccount = accountRepository.save(existingAccount);
+        AccountResponse accountResponse = AccountResponseMapper.MapToResponse(updatedAccount);
+        return new ResponseEntity<>(accountResponse,HttpStatus.OK);
+    }
 
 
 }
