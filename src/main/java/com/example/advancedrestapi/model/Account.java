@@ -23,30 +23,32 @@ import java.util.Date;
 @Builder
 @Entity
 public class Account {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @NotNull(message = "first name is required!!!!")
+    @NotBlank(message = "First name is required.")
     private String firstName;
+
     private String middleName;
-    @NotBlank
-    @NotNull(message = "please provide last name")
+
+    @NotBlank(message = "Last name is required.")
     private String lastName;
-    @NotBlank
-    @NotNull
+
+    @NotBlank(message = "Account number cannot be blank.")
     @Column(unique = true)
     private String accountNumber;
-    @Size(min = 10, max = 15, message = "please provide valid mobile number")
+
+    @Size(min = 10, max = 15, message = "Mobile number must be between 10 and 15 digits.")
     @Column(unique = true)
     private String mobileNumber;
-    @Past(message = "date of birth should be past")
+
+    @Past(message = "Date of birth must be a date in the past.")
     private Date dateOfBirth;
-    @Email(regexp ="[A-Za-z0-9._%-+]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}",
+
+    @Email(regexp = "[A-Za-z0-9._%-+]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}",
             flags = Pattern.Flag.CASE_INSENSITIVE,
-            message ="invalid email format"
-    )
+            message = "Email format is invalid. Please provide a valid email address.")
     @Column(unique = true)
     private String email;
 

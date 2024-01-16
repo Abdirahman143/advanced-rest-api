@@ -58,7 +58,7 @@ public class AccountServiceImpl implements AccountService {
     public Optional<AccountResponse> findAccountDetails(String accountNumber, String email) {
         Optional<Account> accountOptional = accountRepository.findAccountDetails(accountNumber, email);
         if (!accountOptional.isPresent()) {
-            throw new UserNotFoundException("account number" + accountNumber + "and email" + email + "not found. Please try with a valid account number and email.");
+            throw new UserNotFoundException("account number : " + accountNumber + " and email : " + email + "not found. Please try with a valid account number and email.");
         }
         Account account = accountOptional.get();
         AccountResponse accountResponse = AccountResponse
@@ -80,7 +80,7 @@ public class AccountServiceImpl implements AccountService {
                                                                 String email) {
         Optional<Account> accountOptional = accountRepository.findAccountDetails(accountNumber, email);
         if (!accountOptional.isPresent()) {
-            throw new UserNotFoundException("account number" + accountNumber + "and email" + email + "not found. Please try with a valid account number and email.");
+            throw new UserNotFoundException("account number : " + accountNumber + " and email : " + email + "not found. Please try with a valid account number and email.");
         }
 
         Account existingAccount = accountOptional.get();
@@ -111,8 +111,7 @@ public class AccountServiceImpl implements AccountService {
                                                                          String email) {
         Optional<Account> accountOptional = accountRepository.findAccountDetails(accountNumber, email);
         if (!accountOptional.isPresent()) {
-            throw new UserNotFoundException("account number" + accountNumber + "and email" + email + "not found. Please try with a valid account number and email.");
-
+            throw new UserNotFoundException("account number : " + accountNumber + " and email : " + email + "not found. Please try with a valid account number and email.");
         }
         Account existingAccount = accountOptional.get();
         if (partialUpdateRequest.getMobileNumber() != null) {
@@ -131,7 +130,7 @@ public class AccountServiceImpl implements AccountService {
     public ResponseEntity<String> deleteAccountDetails(String accountNumber, String email) {
         Optional<Account> accountOptional = accountRepository.findAccountDetails(accountNumber, email);
         if (!accountOptional.isPresent()) {
-            throw new UserNotFoundException("Account with account number " + accountNumber + " and email " + email + " not found. Please try with a valid account number and email.");
+            throw new UserNotFoundException("account number : " + accountNumber + " and email : " + email + "not found. Please try with a valid account number and email.");
         }
         accountRepository.deleteByAccountNumber(accountNumber);
         return ResponseEntity.ok("Account with account number " + accountNumber+" has been permanently deleted.");
