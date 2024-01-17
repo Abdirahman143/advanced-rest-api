@@ -18,7 +18,6 @@ import java.util.Optional;
 @Service
 public class AccountServiceImpl implements AccountService {
     final private AccountRepository accountRepository;
-
     @Autowired
     public AccountServiceImpl(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
