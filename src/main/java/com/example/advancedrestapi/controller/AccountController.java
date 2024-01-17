@@ -51,10 +51,12 @@ public class AccountController {
 
     //update account details
 
+
     @PutMapping("/{accountNumber}/{email}")
     public ResponseEntity<AccountResponse>updateAccountDetails(@Valid @RequestBody  AccountRequest accountRequest,
                                                                @PathVariable String accountNumber,
                                                                @PathVariable String email)throws UserNotFoundException{
+
         return  accountService.UpdateAccountDetails(accountRequest,accountNumber,email);
 
     }
@@ -65,13 +67,16 @@ public class AccountController {
             AccountPartialUpdateRequest partialUpdateRequest,
             @PathVariable String accountNumber,
             @PathVariable String email)throws UserNotFoundException{
+
         return accountService.updateAccountDetailsPartially(partialUpdateRequest,accountNumber,email);
     }
 
 //Delete account
+
     @DeleteMapping("/{accountNumber}/{email}")
     public ResponseEntity<String> deleteAccountDetails(@PathVariable String accountNumber,
                                                        @PathVariable String email)throws UserNotFoundException{
+
         return accountService.deleteAccountDetails(accountNumber,email);
     }
 
