@@ -50,7 +50,11 @@ public class AccountServiceImpl implements AccountService {
                 map(AccountResponseMapper::MapToResponse).toList(),
                 HttpStatus.FOUND);
 
+
     }
+
+
+
 
 
     //find employee details by email and account number
@@ -72,6 +76,7 @@ public class AccountServiceImpl implements AccountService {
                 build();
         return Optional.of(accountResponse);
     }
+
 
     //updating the account details
     @Override
@@ -112,8 +117,108 @@ public class AccountServiceImpl implements AccountService {
         Optional<Account> accountOptional = accountRepository.findAccountDetails(accountNumber, email);
         if (!accountOptional.isPresent()) {
             throw new UserNotFoundException("account number : " + accountNumber + " and email : " + email + "not found. Please try with a valid account number and email.");
+
+    //find employee details by email and account number
+    @Override
+    public Optional<AccountResponse> findAccountDetails(String accountNumber, String email) {
+        Optional<Account> accountOptional = accountRepository.findAccountDetails(accountNumber, email);
+        if (!accountOptional.isPresent()) {
+
+            throw new UserNotFoundException("account number : " + accountNumber + " and email : " + email + "not found. Please try with a valid account number and email.");
+
+           
+
+        }
+        Account account = accountOptional.get();
+        AccountResponse accountResponse = AccountResponse
+                .builder().
+                id(account.getId()).
+                firstName(account.getFirstName()).
+                middleName(account.getMiddleName()).
+                email(account.getEmail()).
+                accountNumber(account.getAccountNumber()).
+                mobileNumber(account.getMobileNumber()).
+                build();
+        return Optional.of(accountResponse);
+    }
+
+    //updating the account details
+    @Override
+    public ResponseEntity<AccountResponse> UpdateAccountDetails(AccountRequest accountRequest,
+                                                                String accountNumber,
+                                                                String email) {
+        Optional<Account> accountOptional = accountRepository.findAccountDetails(accountNumber, email);
+        if (!accountOptional.isPresent()) {
+
+            throw new UserNotFoundException("account number : " + accountNumber + " and email : " + email + "not found. Please try with a valid account number and email.");
+        }
+
+           
+
+        }
+
+        Account existingAccount = accountOptional.get();
+
+
+        updateAccountDetails(existingAccount, accountRequest);
+        Account updatedAccount = accountRepository.save(existingAccount);
+        AccountResponse accountResponse = AccountResponseMapper.MapToResponse(updatedAccount);
+
+        return new ResponseEntity<>(accountResponse, HttpStatus.OK);
+
+
+    }
+
+    //this method updates the account details
+    public void updateAccountDetails(Account existingAccount, AccountRequest accountRequest) {
+        existingAccount.setFirstName(accountRequest.getFirstName());
+        existingAccount.setMiddleName(accountRequest.getMiddleName());
+        existingAccount.setLastName(accountRequest.getLastName());
+        existingAccount.setMobileNumber(accountRequest.getMobileNumber());
+        existingAccount.setDateOfBirth(accountRequest.getDateOfBirth());
+    }
+
+
+        Account existingAccount = accountOptional.get();
+        updateAccountDetails(existingAccount, accountRequest);
+        Account updatedAccount = accountRepository.save(existingAccount);
+        AccountResponse accountResponse = AccountResponseMapper.MapToResponse(updatedAccount);
+
+        return new ResponseEntity<>(accountResponse, HttpStatus.OK);
+
+
+    @Override
+    public ResponseEntity<AccountResponse> updateAccountDetailsPartially(AccountPartialUpdateRequest partialUpdateRequest,
+                                                                         String accountNumber,
+                                                                         String email) {
+        Optional<Account> accountOptional = accountRepository.findAccountDetails(accountNumber, email);
+        if (!accountOptional.isPresent()) {
+            throw new UserNotFoundException("account number" + accountNumber + "and email" + email + "not found. Please try with a valid account number and email.");
+
+    }
+
+    //this method updates the account details
+    public void updateAccountDetails(Account existingAccount, AccountRequest accountRequest) {
+        existingAccount.setFirstName(accountRequest.getFirstName());
+        existingAccount.setMiddleName(accountRequest.getMiddleName());
+        existingAccount.setLastName(accountRequest.getLastName());
+        existingAccount.setMobileNumber(accountRequest.getMobileNumber());
+        existingAccount.setDateOfBirth(accountRequest.getDateOfBirth());
+    }
+
+
+//partial update the account details
+
+    @Override
+    public ResponseEntity<AccountResponse> updateAccountDetailsPartially(AccountPartialUpdateRequest partialUpdateRequest,
+                                                                         String accountNumber,
+                                                                         String email) {
+        Optional<Account> accountOptional = accountRepository.findAccountDetails(accountNumber, email);
+        if (!accountOptional.isPresent()) {
+            throw new UserNotFoundException("account number : " + accountNumber + " and email : " + email + "not found. Please try with a valid account number and email.");
         }
         Account existingAccount = accountOptional.get();
+
         if (partialUpdateRequest.getMobileNumber() != null) {
             existingAccount.setMobileNumber(partialUpdateRequest.getMobileNumber());
         }
@@ -130,7 +235,9 @@ public class AccountServiceImpl implements AccountService {
     public ResponseEntity<String> deleteAccountDetails(String accountNumber, String email) {
         Optional<Account> accountOptional = accountRepository.findAccountDetails(accountNumber, email);
         if (!accountOptional.isPresent()) {
+
             throw new UserNotFoundException("account number : " + accountNumber + " and email : " + email + "not found. Please try with a valid account number and email.");
+
         }
         accountRepository.deleteByAccountNumber(accountNumber);
         return ResponseEntity.ok("Account with account number " + accountNumber+" has been permanently deleted.");
