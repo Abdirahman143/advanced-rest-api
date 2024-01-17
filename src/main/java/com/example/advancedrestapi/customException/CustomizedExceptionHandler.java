@@ -88,10 +88,12 @@ public class CustomizedExceptionHandler extends ResponseEntityExceptionHandler {
         if (matcher.find()) {
             String constraintName = matcher.group(1);
             switch (constraintName) {
-                case "uk_6hd8egpq0b53frw3m3kibtc5d":
-                    return "An entity with the same identifier (e.g., employee ID or email) already exists.";
-                case "uk_ele2pby24o1hxt8q90l3cwv56":
-                    return "Another entity constraint (e.g., unique employee Id ) violation occurred.";
+                case "uk_kpw06b24l7ha06wiji8twnke5":
+                    return "An entity with the same identifier (e.g., account number) already exists.";
+                case "uk_rxsk4o2eu7th7t3xhdgabsd44":
+                    return "Another entity constraint (e.g.,Email ) violation occurred.";
+                case "uk_1iqtnn4aagcqon0g9ja4pfdd1":
+                    return "Another entity constraint (e.g.,mobile number ) violation occurred.";
                 default:
                     return "Operation cannot be performed due to a data integrity violation.";
             }
