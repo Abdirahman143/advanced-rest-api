@@ -51,29 +51,27 @@ public class AccountController {
 
     //update account details
 
-    @PutMapping()
-    public ResponseEntity<AccountResponse>updateAccountDetails(@RequestBody @Valid
-                                                               AccountRequest accountRequest,
-                                                               @RequestParam(required = true)String accountNumber,
-                                                               @RequestParam(required = true)String email){
+    @PutMapping("/{accountNumber}/{email}")
+    public ResponseEntity<AccountResponse>updateAccountDetails(@Valid @RequestBody  AccountRequest accountRequest,
+                                                               @PathVariable String accountNumber,
+                                                               @PathVariable String email)throws UserNotFoundException{
         return  accountService.UpdateAccountDetails(accountRequest,accountNumber,email);
 
     }
 
-    @PatchMapping("/partial")
+    @PatchMapping("/partial/{accountNumber}/{email}")
     public ResponseEntity<AccountResponse>updateAccountPartially(
             @RequestBody @Valid
             AccountPartialUpdateRequest partialUpdateRequest,
-            @RequestParam String accountNumber,
-            @RequestParam String email
-    ){
+            @PathVariable String accountNumber,
+            @PathVariable String email)throws UserNotFoundException{
         return accountService.updateAccountDetailsPartially(partialUpdateRequest,accountNumber,email);
     }
 
 //Delete account
-    @DeleteMapping
-    public ResponseEntity<String> deleteAccountDetails(@RequestParam String accountNumber,
-                                       @RequestParam String email){
+    @DeleteMapping("/{accountNumber}/{email}")
+    public ResponseEntity<String> deleteAccountDetails(@PathVariable String accountNumber,
+                                                       @PathVariable String email)throws UserNotFoundException{
         return accountService.deleteAccountDetails(accountNumber,email);
     }
 
