@@ -30,7 +30,7 @@ public class AccountController {
     //adding account details to database
 
                    @PostMapping()
-    public ResponseEntity<Account>Save(@RequestBody @Valid AccountRequest accountRequest){
+    public ResponseEntity<Account>Save(@Valid @RequestBody  AccountRequest accountRequest){
         return accountService.addAccount(accountRequest);
     }
 
