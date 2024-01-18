@@ -57,9 +57,9 @@ public Account createAccountTest(){
                 build();
 }
 
-    @DisplayName("verify find account details returns 200")
+    @DisplayName("verify find account details returns account details")
     @Test
-    @Order(1) // if you need to order your tests
+    @Order(1)
     public void testFindAccountDetailsByAccountNumberAndEmail_Found(){
         Optional<Account> accountOptional = accountRepository.findAccountDetails(account.getAccountNumber(), account.getEmail());
 
@@ -90,6 +90,49 @@ public Account createAccountTest(){
 
         //logging
        logger.info("Account found with account number: " + account.getAccountNumber());
+    }
+
+
+
+
+    @DisplayName("verify find account details with either wrong account number or email returns Not found")
+    @Test
+    @Order(2)
+    public void testFindAccountDetailsByAccountNumberAndEmail_NotFound() {
+        String wrongAccount = "123890";
+        String wrongEmail = "bashir@gmail.com";
+
+        // Test with wrong account number
+        Optional<Account> accountOptional = accountRepository.findAccountDetails(wrongAccount, account.getEmail());
+        assertThat(accountOptional)
+                .as("Account should not be found with wrong account number")
+                .isEmpty();
+
+        // Test with wrong email
+        Optional<Account> accountOptional1 = accountRepository.findAccountDetails(account.getAccountNumber(), wrongEmail);
+        assertThat(accountOptional1)
+                .as("Account should not be found with wrong email")
+                .isEmpty();
+    }
+
+    //delete existing account details
+
+    @DisplayName("verify find account details returns account details")
+    @Test
+    @Order(3)
+    public void testDeleteAccountDetailsByAccountNumberReturn_Success(){
+        String accountNumber = account.getAccountNumber();
+        assertThat(accountRepository.findAccountDetails(accountNumber,account.getEmail())).
+                as("Account should exist before deletion").
+                isNotEmpty();
+
+        //deleting the accountNumber
+        accountRepository.deleteByAccountNumber(account.getAccountNumber());
+
+        assertThat(accountRepository.findAccountDetails(accountNumber,account.getEmail())).
+                as("Account should not exist after deletion").
+                isEmpty();
+
     }
 
 }
