@@ -6,6 +6,11 @@ import com.example.advancedrestapi.request.AccountPartialUpdateRequest;
 import com.example.advancedrestapi.request.AccountRequest;
 import com.example.advancedrestapi.response.AccountResponse;
 import com.example.advancedrestapi.service.AccountService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.persistence.GeneratedValue;
 import jakarta.validation.Valid;
 import org.springframework.data.repository.query.Param;
@@ -30,6 +35,19 @@ public class AccountController {
     //adding account details to database
 
                    @PostMapping()
+                   @Operation(summary = "add account info")
+                   @ApiResponses(value = {
+                           @ApiResponse(
+                                   responseCode = "201",
+                                   description = "Account details created!",
+                                   content = {
+                                           @Content(mediaType = "application/json",
+                                                   schema = @Schema(implementation = AccountResponse.class)
+                                           )
+                                   }
+                           ),
+                           @ApiResponse(responseCode = "400",description = "invalid Inputs!!")
+                   })
     public ResponseEntity<Account>Save(@Valid @RequestBody  AccountRequest accountRequest){
         return accountService.addAccount(accountRequest);
     }
