@@ -129,4 +129,52 @@ class AccountControllerTest {
     }
 
 
+    //add account with empty required fields
+
+@DisplayName("verify add account details with empty fields should throw an errors")
+@Order(2)
+@Test
+    public void  addAccountDetailsWithBlankRequiredFields() throws Exception {
+    //arrange
+        AccountRequest emptyFieldsRequest = AccountRequest.
+                builder().
+                firstName("").
+                middleName("Abdirahman").
+                lastName(null).
+                accountNumber("").
+                mobileNumber("0700916533").
+                email("bashir.abdi@test.com").
+                dateOfBirth(null).
+                build();
+
+    String JsonFields = objectMapper.writeValueAsString(emptyFieldsRequest);
+
+
+    //acct and assert
+
+    mockMvc.perform(post("/api/v1/accounts").
+            contentType(MediaType.APPLICATION_JSON).
+            content(JsonFields)
+    ).
+            andExpect(status().isBadRequest()).
+            andExpect(jsonPath("$.message").value("Validation Errors")).
+            andExpect(jsonPath("$.errors").isArray()).
+            andExpect(jsonPath("$.errors",hasSize(4))).
+            andExpect(jsonPath("$.errors",containsInAnyOrder(
+                    "accountRequest : First name is required.",
+                    "accountRequest : Last name is required.",
+                    "accountRequest : Account number is required.",
+                    "accountRequest : Date of birth is required"
+            ))).
+            andDo(print());
+
+
+    //verify no interaction
+
+    verify(accountService,never()).addAccount(any(AccountRequest.class));
+
+
+
+    }
+
 }

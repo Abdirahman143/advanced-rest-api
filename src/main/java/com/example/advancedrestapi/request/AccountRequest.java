@@ -16,8 +16,6 @@ import java.util.Date;
 public class AccountRequest {
 
 
-
-
     @NotBlank(message = "First name is required.")
     private String firstName;
 
@@ -26,20 +24,24 @@ public class AccountRequest {
     @NotBlank(message = "Last name is required.")
     private String lastName;
 
-    @NotBlank(message = "Account number cannot be blank.")
+    @NotBlank(message = "Account number is required.")
     @Column(unique = true)
     private String accountNumber;
 
     @Size(min = 10, max = 15, message = "Mobile number must be between 10 and 15 digits.")
     @Column(unique = true)
+    @NotBlank(message = "Mobile number is required")
     private String mobileNumber;
 
-    @Past(message = "Date of birth must be a date in the past.")
+    @NotNull(message = "Date of birth is required")
+    @Past(message = "Date of birth must be in the past")
     private Date dateOfBirth;
 
     @Email(regexp = "[A-Za-z0-9._%-+]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}",
             flags = Pattern.Flag.CASE_INSENSITIVE,
             message = "Email format is invalid. Please provide a valid email address.")
     @Column(unique = true)
+    @NotBlank(message = "email is required!")
     private String email;
+
 }
