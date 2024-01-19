@@ -68,52 +68,19 @@ class AccountControllerTest {
                 build();
 
         objectMapper= new ObjectMapper();
-        account = createAccountTest();
-        accountRequest = createAccountRequestTest();
+        LocalDate dob = LocalDate.now().minusYears(30);
+        account = TestDataProvider.createAccount("Abdirahman", "Abdi", "1234567", "bashir@test.com", "0722345673", dob);
+        accountRequest = TestDataProvider.createAccountRequest("Abdirahman", "Abdi", "1234567", "bashir@test.com", "0722345673", dob);
         accountResponse = new AccountResponse();
     }
 
-    public Account createAccountTest(){
-        // Create a date that is definitely in the past, e.g., 30 years ago from now
-        LocalDate localDateOfBirth = LocalDate.now().minusYears(30);
-        // Convert LocalDate to Date
-        Date dateOfBirth = Date.from(localDateOfBirth.atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-        return Account.
-                builder().
-                firstName("Abdirahman").
-                middleName("Bashir").
-                lastName("Abdi").
-                accountNumber("1234567").
-                email("bashir@test.com").
-                mobileNumber("0722345673").
-                dateOfBirth(dateOfBirth).
-                build();
-    }
-
-    private AccountRequest createAccountRequestTest(){
-        // Create a date that is definitely in the past, e.g., 30 years ago from now
-        LocalDate localDateOfBirth = LocalDate.now().minusYears(30);
-        // Convert LocalDate to Date
-        Date dateOfBirth = Date.from(localDateOfBirth.atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-        return AccountRequest.
-                builder().
-                firstName("Abdirahman").
-                middleName("Bashir").
-                lastName("Abdi").
-                accountNumber("1234567").
-                email("bashir@test.com").
-                mobileNumber("0722345673").
-                dateOfBirth(dateOfBirth).
-                build();
-    }
 
     // add account details endpoint
     @DisplayName("verify add account details should return success")
     @Order(1)
     @Test
     public void addAccountDetails() throws Exception {
+        //Arrange
         String validJson = objectMapper.writeValueAsString(accountRequest);
         when(accountService.addAccount(any(AccountRequest.class))).thenReturn(ResponseEntity.ok(account));
 
@@ -123,7 +90,7 @@ class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accountNumber").value(account.getAccountNumber()))
                 .andExpect(jsonPath("$.email").value(account.getEmail()))
-                .andExpect(jsonPath("$.dateOfBirth").value(account.getDateOfBirth()))
+                .andExpect(jsonPath("$.dateOfBirth").value("1994-01-18"))
                 .andDo(print());
 
         verify(accountService, times(1)).addAccount(any(AccountRequest.class));
@@ -164,8 +131,8 @@ class AccountControllerTest {
             andExpect(jsonPath("$.errors",containsInAnyOrder(
                     "accountRequest : First name is required.",
                     "accountRequest : Last name is required.",
-                    "accountRequest : Account number is required.",
-                    "accountRequest : Date of birth is required"
+                    "accountRequest : Date of birth is required",
+                    "accountRequest : Account number is required."
             ))).
             andDo(print());
 
@@ -214,9 +181,7 @@ class AccountControllerTest {
                 andExpect(jsonPath("$.message").value("Validation Errors")).
                 andExpect(jsonPath("$.errors").isArray()).
                 andExpect(jsonPath("$.errors",hasSize(1))).
-                andExpect(jsonPath("$.errors", Matchers.contains(
-                        "accountRequest : Email format is invalid. Please provide a valid email address."
-                ))).
+                andExpect(jsonPath("$.errors[0]").value( "accountRequest : Email format is invalid. Please provide a valid email address.")).
                 andDo(print());
 
         //verify no interaction
@@ -271,5 +236,12 @@ class AccountControllerTest {
 
         verify(accountService, never()).addAccount(any(AccountRequest.class));
     }
+
+
+
+
+
+
+
 
 }
