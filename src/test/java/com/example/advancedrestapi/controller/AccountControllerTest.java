@@ -7,6 +7,7 @@ import com.example.advancedrestapi.response.AccountResponse;
 import com.example.advancedrestapi.service.AccountService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -175,6 +176,100 @@ class AccountControllerTest {
 
 
 
+    }
+// email format validation
+
+    @DisplayName("verify add account details with invalid email format should throw an errors")
+    @Order(3)
+    @Test
+    public void  addAccountDetailsWithInvalidEmailFormat() throws Exception {
+
+        //Arrange
+        // Create a date that is definitely in the past, e.g., 30 years ago from now
+        LocalDate localDateOfBirth = LocalDate.now().minusYears(30);
+        // Convert LocalDate to Date
+        Date dateOfBirth = Date.from(localDateOfBirth.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+      AccountRequest invalidEmailFormat =AccountRequest.
+              builder().
+              firstName("Abdi").
+              middleName("Abdirahman").
+              lastName("Abdi").
+              accountNumber("345678").
+              mobileNumber("0700916533").
+              email("bashir.abdi@test").
+              dateOfBirth(dateOfBirth).
+              build();
+
+      String  jsonFormat = objectMapper.writeValueAsString(invalidEmailFormat);
+
+
+      //act and assert
+
+        mockMvc.perform(post("/api/v1/accounts")
+                .contentType(MediaType.APPLICATION_JSON).
+                content(jsonFormat)
+        ).
+                andExpect(status().isBadRequest()).
+                andExpect(jsonPath("$.message").value("Validation Errors")).
+                andExpect(jsonPath("$.errors").isArray()).
+                andExpect(jsonPath("$.errors",hasSize(1))).
+                andExpect(jsonPath("$.errors", Matchers.contains(
+                        "accountRequest : Email format is invalid. Please provide a valid email address."
+                ))).
+                andDo(print());
+
+        //verify no interaction
+        verify(accountService, never()).addAccount(any(AccountRequest.class));
+    }
+
+
+    //Invalid mobile number size and date of birth format
+
+    @DisplayName("verify add account details with invalid phone number format and Future DOB should throw an errors")
+    @Order(4)
+    @Test
+    public void  addAccountDetailsWithInvalidMobileNumberSizeAndDateOfBirthFormat() throws Exception {
+
+        //arrange
+        LocalDate localDateOfBirth = LocalDate.now().plusYears(2);
+        // Convert LocalDate to Date
+        Date dateOfBirth = Date.from(localDateOfBirth.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        AccountRequest invalidRequest = AccountRequest.
+                builder().
+                firstName("Abdi").
+                middleName("Abdirahman").
+                lastName("Abdi").
+                accountNumber("345678").
+                mobileNumber("070091653").
+                email("bashir.abdi@test.com").
+                dateOfBirth(dateOfBirth).
+                build();
+
+        String invalidObject = objectMapper.writeValueAsString(invalidRequest);
+
+
+        //act and assert
+
+        mockMvc.perform(post("/api/v1/accounts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalidObject)
+        )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Validation Errors"))
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors",hasSize(2)))
+                .andExpect(jsonPath("$.errors",containsInAnyOrder(
+                        "accountRequest : Mobile number must be between 10 and 15 digits.",
+                        "accountRequest : Date of birth must be in the past"
+                )))
+                .andDo(print());
+
+
+        //verify no interaction between controller and service layer
+
+
+        verify(accountService, never()).addAccount(any(AccountRequest.class));
     }
 
 }
