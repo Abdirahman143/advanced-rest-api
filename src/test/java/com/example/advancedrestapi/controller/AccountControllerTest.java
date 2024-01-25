@@ -22,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -253,6 +254,48 @@ class AccountControllerTest {
 
 
 
+// add account details with duplicate account number
+
+    @DisplayName("Verify add account with duplicate account number should return error")
+    @Test
+    @Order(5)
+    public void shouldReturnErrorWhenAddingAccountWithDuplicateNumber() throws Exception {
+        //arrange
+        LocalDate localDateOfBirth = LocalDate.now().minusYears(22);
+        // Convert LocalDate to Date
+        Date dateOfBirth = Date.from(localDateOfBirth.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        AccountRequest duplicateRequest =AccountRequest.
+                builder().
+                firstName("Asho").
+                middleName("Ahmed").
+                lastName("Abdi").
+                accountNumber("1234567895").
+                mobileNumber("0700815432").
+                dateOfBirth(dateOfBirth).
+                email("asho.ahmed1@gmail.com").
+                build();
+
+        String jsonRequest = objectMapper.writeValueAsString( duplicateRequest);
+        when(accountService.addAccount(any(AccountRequest.class))).
+                thenThrow(new DataIntegrityViolationException("An entity with the same identifier (e.g., account number) already exists."));
+
+        //act and assert
+        mockMvc.perform(post("/api/v1/accounts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonRequest)
+        ).
+                andExpect(status().isBadRequest()).
+                andExpect(jsonPath("$.message").value("Data Integrity Error")).
+                andExpect(jsonPath("$.errors").isArray()).
+                andExpect(jsonPath("$.errors",hasSize(1))).
+                andExpect(jsonPath("$.errors[0]").value("Operation cannot be performed due to a data integrity violation.")).
+                andDo(print());
+
+
+        //verify no interation
+        verify(accountService,times(1)).addAccount(any(AccountRequest.class));
+
+    }
 
 
 
