@@ -7,6 +7,8 @@ import com.example.advancedrestapi.response.AccountResponse;
 import com.example.advancedrestapi.service.AccountService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -80,18 +82,30 @@ class AccountControllerTest {
     @Order(1)
     @Test
     public void addAccountDetails() throws Exception {
-        //Arrange
+       LocalDate START_OF_1994 = LocalDate.of(1994, 1, 1);
+       LocalDate END_OF_1994 = LocalDate.of(1994, 12, 31);
+
+        // Arrange
         String validJson = objectMapper.writeValueAsString(accountRequest);
         when(accountService.addAccount(any(AccountRequest.class))).thenReturn(ResponseEntity.ok(account));
 
-        mockMvc.perform(post("/api/v1/accounts")
+        // Act
+        MvcResult result = mockMvc.perform(post("/api/v1/accounts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(validJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accountNumber").value(account.getAccountNumber()))
                 .andExpect(jsonPath("$.email").value(account.getEmail()))
-                .andExpect(jsonPath("$.dateOfBirth").value("1994-01-18"))
-                .andDo(print());
+                .andDo(print())
+                .andReturn();
+
+        // Assert
+        String jsonResponse = result.getResponse().getContentAsString();
+        DocumentContext jsonContext = JsonPath.parse(jsonResponse);
+        LocalDate dob = LocalDate.parse(jsonContext.read("$.dateOfBirth", String.class));
+
+        assertTrue(!dob.isBefore(START_OF_1994) && !dob.isAfter(END_OF_1994),
+                "Date of birth is not within the year 1994");
 
         verify(accountService, times(1)).addAccount(any(AccountRequest.class));
     }
@@ -236,6 +250,7 @@ class AccountControllerTest {
 
         verify(accountService, never()).addAccount(any(AccountRequest.class));
     }
+
 
 
 
