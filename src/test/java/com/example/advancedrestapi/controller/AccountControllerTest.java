@@ -74,7 +74,7 @@ class AccountControllerTest {
         LocalDate dob = LocalDate.now().minusYears(30);
         account = TestDataProvider.createAccount("Abdirahman", "Abdi", "1234567", "bashir@test.com", "0722345673", dob);
         accountRequest = TestDataProvider.createAccountRequest("Abdirahman", "Abdi", "1234567", "bashir@test.com", "0722345673", dob);
-        accountResponse = new AccountResponse();
+        accountResponse =  TestDataProvider.createAccountResponse(1l,"Abdirahman", "Abdi", "1234567", "bashir@test.com", "0722345673", dob);
     }
 
 
@@ -371,6 +371,9 @@ class AccountControllerTest {
         //verify no interaction
         verify(accountService,times(2)).addAccount(any(AccountRequest.class));
     }
+
+
+
 
 
 
