@@ -30,6 +30,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -74,7 +75,7 @@ class AccountControllerTest {
         LocalDate dob = LocalDate.now().minusYears(30);
         account = TestDataProvider.createAccount("Abdirahman", "Abdi", "1234567", "bashir@test.com", "0722345673", dob);
         accountRequest = TestDataProvider.createAccountRequest("Abdirahman", "Abdi", "1234567", "bashir@test.com", "0722345673", dob);
-        accountResponse =  TestDataProvider.createAccountResponse(1l,"Abdirahman", "Abdi", "1234567", "bashir@test.com", "0722345673", dob);
+
     }
 
 
@@ -373,7 +374,31 @@ class AccountControllerTest {
     }
 
 
+    //verify get all account details should return success
 
+    @DisplayName("verify get all acount details should return success")
+    @Test
+    @Order(7)
+    public void getAllAccountDetailsShouldReturnSuccess() throws Exception {
+        //Arrange
+       List<AccountResponse>accountResponse = TestDataProvider.createTestAccountResponses();
+       ResponseEntity<List<AccountResponse>>expectedResponse =new ResponseEntity<>(accountResponse,HttpStatus.OK);
+
+        when(accountService.getAllAccounts()).thenReturn(expectedResponse);
+
+        mockMvc.perform(get("/api/v1/accounts")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).
+                andExpect(jsonPath("$",hasSize(accountResponse.size()))).
+                andExpect(jsonPath("$[0].email").value(accountResponse.get(0).getEmail()))
+                .andDo(print());
+
+
+        //verify there is one interaction
+
+        verify(accountService,times(1s)).getAllAccounts();
+
+    }
 
 
 
