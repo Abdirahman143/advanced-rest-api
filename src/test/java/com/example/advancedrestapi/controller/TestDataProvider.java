@@ -2,6 +2,7 @@ package com.example.advancedrestapi.controller;
 
 import com.example.advancedrestapi.model.Account;
 import com.example.advancedrestapi.request.AccountRequest;
+import com.example.advancedrestapi.response.AccountResponse;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -22,6 +23,18 @@ public class TestDataProvider {
 
     public static AccountRequest createAccountRequest(String firstName, String lastName, String accountNumber, String email, String mobileNumber, LocalDate dob) {
         return AccountRequest.builder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .accountNumber(accountNumber)
+                .email(email)
+                .mobileNumber(mobileNumber)
+                .dateOfBirth(Date.from(dob.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                .build();
+    }
+
+    public static AccountResponse createAccountResponse(Long id, String firstName, String lastName, String accountNumber, String email, String mobileNumber, LocalDate dob) {
+        return AccountResponse.builder()
+                .id(id)
                 .firstName(firstName)
                 .lastName(lastName)
                 .accountNumber(accountNumber)
