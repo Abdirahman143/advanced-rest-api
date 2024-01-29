@@ -396,10 +396,38 @@ class AccountControllerTest {
 
         //verify there is one interaction
 
-        verify(accountService,times(1s)).getAllAccounts();
+        verify(accountService,times(1)).getAllAccounts();
 
     }
 
+    @DisplayName("Verify get account with Valid Account Number and Email should return success")
+    @Test
+    @Order(8)
+    public void getAccountDetailsWithValidAccountNumberAndEmailReturnSuccess() throws Exception {
+        // Arrange
 
+        String accountNumber = TestDataProvider.createTestAccountResponses().get(0).getAccountNumber();
+        String email = TestDataProvider.createTestAccountResponses().get(0).getEmail();
+        when(accountService.findAccountDetails(accountNumber, email)).
+                thenReturn(Optional.of(TestDataProvider.createTestAccountResponses().get(0)));
+        //Act and Assert
+    mockMvc.perform(get("/api/v1/accounts/details")
+            .contentType(MediaType.APPLICATION_JSON)
+            .param("accountNumber",accountNumber)
+            .param("email",email)
+    ).
+            andExpect(status().isOk()).
+            andExpect(header().string("Content-Type", "application/json")).
+            andExpect(jsonPath("$.accountNumber").value(accountNumber)).
+            andExpect(jsonPath("$.email").value(email)).
+            andDo(print());
+
+
+    //verify the interaction
+    verify(accountService,times(1)).findAccountDetails(accountNumber,email);
+
+
+
+}
 
 }
