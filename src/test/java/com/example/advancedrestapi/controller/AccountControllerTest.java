@@ -1,6 +1,7 @@
 package com.example.advancedrestapi.controller;
 
 import com.example.advancedrestapi.customException.CustomizedExceptionHandler;
+import com.example.advancedrestapi.customException.UserNotFoundException;
 import com.example.advancedrestapi.model.Account;
 import com.example.advancedrestapi.request.AccountRequest;
 import com.example.advancedrestapi.response.AccountResponse;
@@ -429,5 +430,34 @@ class AccountControllerTest {
 
 
 }
+    @DisplayName("Verify get account with InValid Account Number and Email should throw an error")
+    @Test
+    @Order(8)
+    public void getAccountDetailsWithInValidAccountNumberAndEmailReturnSuccess() throws Exception {
+        //Arrange
+        String accountNumber ="45678901";
+        String email = "cbc.test@gmail.com";
+        String message = "account number : " + accountNumber + " and email : " + email + "not found. Please try with a valid account number and email.";
+        when(accountService.findAccountDetails(accountNumber,email)).
+                thenThrow(new UserNotFoundException(message));
+
+        //Act and Assert
+        mockMvc.perform(get("/api/v1/accounts/details").
+                contentType(MediaType.APPLICATION_JSON).
+                param("accountNumber",accountNumber).
+                param("email",email)
+                ).
+                andExpect(status().isNotFound()).
+                andExpect(jsonPath("$.message").value("Resource Not Found")).
+                andExpect(jsonPath("$.errors[0]").value(message)).
+                andDo(print());
+
+
+        //verify the service interaction
+        verify(accountService,times(1)).findAccountDetails(accountNumber,email);
+
+
+    }
+
 
 }
