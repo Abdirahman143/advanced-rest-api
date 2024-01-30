@@ -432,7 +432,7 @@ class AccountControllerTest {
 }
     @DisplayName("Verify get account with InValid Account Number and Email should throw an error")
     @Test
-    @Order(8)
+    @Order(9)
     public void getAccountDetailsWithInValidAccountNumberAndEmailReturnSuccess() throws Exception {
         //Arrange
         String accountNumber ="45678901";
@@ -458,6 +458,49 @@ class AccountControllerTest {
 
 
     }
+    @DisplayName("Test: Updating account details with valid account number and email should succeed")
+    @Test
+    @Order(10)
+    public void shouldUpdateAccountDetailsSuccessfullyWithValidData() throws Exception {
+        // Arrange
+        AccountResponse testAccount = TestDataProvider.createTestAccountResponses().get(0);
+        String accountNumber = testAccount.getAccountNumber();
+        String email = testAccount.getEmail();
 
+        AccountRequest accountRequest = AccountRequest.builder()
+                .firstName("Mohamed")
+                .middleName("Ahmed")
+                .lastName("Kahim")
+                .accountNumber(testAccount.getAccountNumber())
+                .mobileNumber(testAccount.getMobileNumber())
+                .email(testAccount.getEmail())
+                .dateOfBirth(testAccount.getDateOfBirth())
+                .build();
+
+        AccountResponse expectedUpdatedAccount = AccountResponse.builder()
+                .firstName(accountRequest.getFirstName())
+                .middleName(accountRequest.getMiddleName())
+                .lastName(accountRequest.getLastName())
+                .mobileNumber(testAccount.getMobileNumber())
+                .accountNumber(testAccount.getAccountNumber())
+                .email(testAccount.getEmail())
+                .dateOfBirth(testAccount.getDateOfBirth())
+                .build();
+
+        String jsonRequest = objectMapper.writeValueAsString(accountRequest);
+
+        when(accountService.UpdateAccountDetails(any(AccountRequest.class), eq(accountNumber), eq(email)))
+                .thenReturn(new ResponseEntity<>(expectedUpdatedAccount, HttpStatus.OK));
+
+        // Act and Assert
+        mockMvc.perform(put("/api/v1/accounts/{accountNumber}/{email}", accountNumber, email)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest))
+                .andDo(print());
+
+        // Verify
+        verify(accountService, times(1))
+                .UpdateAccountDetails(any(AccountRequest.class), eq(accountNumber), eq(email));
+    }
 
 }
