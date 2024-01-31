@@ -696,11 +696,9 @@ class AccountControllerTest {
     @Order(14)
     @Test
     public void shouldDeleteAccountDetailsWithValidAccountNumberAndEmailReturnSuccessful() throws Exception {
-        //Arrange
+        // Arrange: Setup a test account with valid account number and email
         AccountResponse testAccount  = TestDataProvider.createTestAccountResponses().get(0);
-        //valid account number
         String accountNumber = testAccount.getAccountNumber();
-        //valid email
         String email  = testAccount.getEmail();
 
         when(accountService.deleteAccountDetails(accountNumber,email)).
@@ -715,10 +713,11 @@ class AccountControllerTest {
                 andDo(print());
 
 
-        //verify
-        verify(accountService).deleteAccountDetails(eq(accountNumber),eq(email));
-
-
+       // Verify that the service method was called with the correct parameters
+        verify(accountService,times(1)).deleteAccountDetails(eq(accountNumber), eq(email));
     }
+
+
+
 
 }
