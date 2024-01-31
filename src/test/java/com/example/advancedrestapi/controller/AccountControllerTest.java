@@ -625,5 +625,71 @@ class AccountControllerTest {
 
     }
 
+    @DisplayName("Test: Updating Partially account details with invalid accountNumber and email should Throw an error!")
+    @Test
+    @Order(13)
+    public void shouldPartialUpdateAccountDetailsUnSuccessfulWithInValidEmailOrAccountNumber() throws Exception {
+        // Arrange
+
+        //arrange
+        LocalDate localDateOfBirth = LocalDate.now().minusYears(26);
+        // Convert LocalDate to Date
+        Date dateOfBirth = Date.from(localDateOfBirth.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        AccountResponse originalAccountResponse = TestDataProvider.createTestAccountResponses().get(0);
+        //wrong accountNumber
+        String accountNumber ="2907666";
+        String email = originalAccountResponse.getEmail();
+
+        //What goes to the body of the request---> fields to be updated
+        AccountPartialUpdateRequest partialUpdateRequest =
+                AccountPartialUpdateRequest.
+                        builder().
+                        mobileNumber("0733816522").
+                        dateOfBirth(dateOfBirth).
+                        build();
+
+        //Expected Response
+        AccountResponse expectedResponse = AccountResponse.
+                builder().
+                firstName(originalAccountResponse.getFirstName()).
+                middleName(originalAccountResponse.getMiddleName()).
+                lastName(originalAccountResponse.getLastName()).
+                accountNumber(originalAccountResponse.getAccountNumber()).
+                email(originalAccountResponse.getEmail()).
+                mobileNumber(partialUpdateRequest.getMobileNumber()).
+                dateOfBirth(partialUpdateRequest.getDateOfBirth()).
+                build();
+        String message = "account number : " + accountNumber + " and email : " + email + "not found. Please try with a valid account number and email.";
+
+        when(accountService.
+                updateAccountDetailsPartially(any(AccountPartialUpdateRequest.class),eq(accountNumber),eq(email))).
+               thenThrow(new UserNotFoundException(message));
+
+        String jsonBody = objectMapper.writeValueAsString(partialUpdateRequest);
+       //Act and Assert
+
+        mockMvc.perform(patch
+                        ("/api/v1/accounts/partial/{accountNumber}/{email}",accountNumber,email)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBody)
+        ).
+                andExpect(status().isNotFound()).
+                andExpect(jsonPath("$.message").value("Resource Not Found")).
+                andExpect(jsonPath("$.errors[0]").value(message)).
+                andDo(print());
+
+
+
+
+        //verify
+
+        verify(accountService,times(1)).
+                updateAccountDetailsPartially(any(AccountPartialUpdateRequest.class),eq(accountNumber),eq(email));
+
+    }
+
+
+    //Delete account details with valid accountNumber and email
 
 }
