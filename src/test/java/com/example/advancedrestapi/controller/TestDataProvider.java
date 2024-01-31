@@ -35,7 +35,7 @@ public class TestDataProvider {
 
 public static List<AccountResponse> createTestAccountResponses() {
       //arrange
-      LocalDate localDateOfBirth = LocalDate.now().plusYears(23);
+      LocalDate localDateOfBirth = LocalDate.now().minusYears(23);
       // Convert LocalDate to Date
       Date dateOfBirth = Date.from(localDateOfBirth.atStartOfDay(ZoneId.systemDefault()).toInstant());
              return List.of(
@@ -45,7 +45,7 @@ public static List<AccountResponse> createTestAccountResponses() {
                              middleName("Dalaac").
                              lastName("Kahin").
                              accountNumber("345678900").
-                             mobileNumber("070091653").
+                             mobileNumber("0700816522").
                              email("kahin.abdi@test.com").
                              dateOfBirth(dateOfBirth).
                              build(),
