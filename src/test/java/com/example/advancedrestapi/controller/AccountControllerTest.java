@@ -692,4 +692,33 @@ class AccountControllerTest {
 
     //Delete account details with valid accountNumber and email
 
+    @DisplayName("Test:verify delete account details with valid accountNumber and email should return success")
+    @Order(14)
+    @Test
+    public void shouldDeleteAccountDetailsWithValidAccountNumberAndEmailReturnSuccessful() throws Exception {
+        //Arrange
+        AccountResponse testAccount  = TestDataProvider.createTestAccountResponses().get(0);
+        //valid account number
+        String accountNumber = testAccount.getAccountNumber();
+        //valid email
+        String email  = testAccount.getEmail();
+
+        when(accountService.deleteAccountDetails(accountNumber,email)).
+                thenReturn(new ResponseEntity<>(HttpStatus.OK));
+
+        //Act and Assert
+        mockMvc.perform(
+                delete("/api/v1/accounts/{accountNumber}/{email}",accountNumber,email)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).
+                andExpect(status().isOk()).
+                andDo(print());
+
+
+        //verify
+        verify(accountService).deleteAccountDetails(eq(accountNumber),eq(email));
+
+
+    }
+
 }
