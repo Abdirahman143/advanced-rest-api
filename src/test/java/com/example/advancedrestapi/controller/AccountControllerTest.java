@@ -3,6 +3,7 @@ package com.example.advancedrestapi.controller;
 import com.example.advancedrestapi.customException.CustomizedExceptionHandler;
 import com.example.advancedrestapi.customException.UserNotFoundException;
 import com.example.advancedrestapi.model.Account;
+import com.example.advancedrestapi.request.AccountPartialUpdateRequest;
 import com.example.advancedrestapi.request.AccountRequest;
 import com.example.advancedrestapi.response.AccountResponse;
 import com.example.advancedrestapi.service.AccountService;
@@ -564,5 +565,65 @@ class AccountControllerTest {
 
 
     }
+
+    @DisplayName("Test: Updating Partially account details with valid should return success")
+    @Test
+    @Order(12)
+    public void shouldPartialUpdateAccountDetailsSuccessfullyWithValidData() throws Exception {
+        // Arrange
+
+        //arrange
+        LocalDate localDateOfBirth = LocalDate.now().minusYears(26);
+        // Convert LocalDate to Date
+        Date dateOfBirth = Date.from(localDateOfBirth.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        AccountResponse originalAccountResponse = TestDataProvider.createTestAccountResponses().get(0);
+        String accountNumber = originalAccountResponse.getAccountNumber();
+        String email = originalAccountResponse.getEmail();
+
+        //What goes to the body of the request---> fields to be updated
+        AccountPartialUpdateRequest partialUpdateRequest =
+                AccountPartialUpdateRequest.
+                        builder().
+                        mobileNumber("0733816522").
+                        dateOfBirth(dateOfBirth).
+                        build();
+
+        //Expected Response
+        AccountResponse expectedResponse = AccountResponse.
+                builder().
+                firstName(originalAccountResponse.getFirstName()).
+                middleName(originalAccountResponse.getMiddleName()).
+                lastName(originalAccountResponse.getLastName()).
+                accountNumber(originalAccountResponse.getAccountNumber()).
+                email(originalAccountResponse.getEmail()).
+                mobileNumber(partialUpdateRequest.getMobileNumber()).
+                dateOfBirth(partialUpdateRequest.getDateOfBirth()).
+                build();
+
+        when(accountService.
+                updateAccountDetailsPartially(any(AccountPartialUpdateRequest.class),eq(accountNumber),eq(email))).
+                thenReturn(new ResponseEntity<>(expectedResponse,HttpStatus.OK));
+
+        String jsonBody = objectMapper.writeValueAsString(partialUpdateRequest);
+
+        //Act and Assert
+
+        mockMvc.perform(patch
+                ("/api/v1/accounts/partial/{accountNumber}/{email}",accountNumber,email)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonBody)).
+                andExpect(status().isOk()).
+                andExpect(jsonPath("$.dateOfBirth").value(dateOfBirth)).
+                andExpect(jsonPath("$.mobileNumber").value(expectedResponse.getMobileNumber())).
+                andDo(print());
+
+
+        //verify
+
+        verify(accountService,times(1)).
+                updateAccountDetailsPartially(any(AccountPartialUpdateRequest.class),eq(accountNumber),eq(email));
+
+    }
+
 
 }
