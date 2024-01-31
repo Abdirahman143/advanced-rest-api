@@ -471,9 +471,9 @@ class AccountControllerTest {
                 .firstName("Mohamed")
                 .middleName("Ahmed")
                 .lastName("Kahim")
-                .accountNumber(testAccount.getAccountNumber())
                 .mobileNumber(testAccount.getMobileNumber())
-                .email(testAccount.getEmail())
+                .accountNumber(accountNumber)
+                .email(email)
                 .dateOfBirth(testAccount.getDateOfBirth())
                 .build();
 
@@ -482,8 +482,8 @@ class AccountControllerTest {
                 .middleName(accountRequest.getMiddleName())
                 .lastName(accountRequest.getLastName())
                 .mobileNumber(testAccount.getMobileNumber())
-                .accountNumber(testAccount.getAccountNumber())
-                .email(testAccount.getEmail())
+                .accountNumber(accountNumber)
+                .email(email)
                 .dateOfBirth(testAccount.getDateOfBirth())
                 .build();
 
@@ -496,11 +496,73 @@ class AccountControllerTest {
         mockMvc.perform(put("/api/v1/accounts/{accountNumber}/{email}", accountNumber, email)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
+                .andExpect(status().isOk()).
+                andExpect(jsonPath("$.email").value(email))
+                .andExpect(jsonPath("$.accountNumber").value(accountNumber))
+                .andExpect(jsonPath("$.firstName").value(expectedUpdatedAccount.getFirstName()))
                 .andDo(print());
 
         // Verify
         verify(accountService, times(1))
                 .UpdateAccountDetails(any(AccountRequest.class), eq(accountNumber), eq(email));
+    }
+
+    //update account details with either wrong account number or email
+
+    @DisplayName("Test: Updating account details with Invalid account number or email should throw an error")
+    @Test
+    @Order(11)
+    public void shouldUpdateAccountDetailsUnSuccessfulWithInValidData() throws Exception {
+        // Arrange
+        AccountResponse testAccount =TestDataProvider.createTestAccountResponses().get(0);
+        //wrong email
+        String email ="omar.bashir@test.com";
+        //correct accountNumber
+        String accountNumber = testAccount.getAccountNumber();
+        //account request --> what goes to the body of the request
+        AccountRequest testRequest = AccountRequest.
+                builder().
+                firstName("Shukri").
+                middleName("Kahin").
+                lastName(testAccount.getLastName()).
+                email(email).
+                accountNumber(accountNumber).
+                mobileNumber(testAccount.getMobileNumber()) .
+                dateOfBirth(testAccount.getDateOfBirth()).
+                build();
+
+        //ExpectedResponse returns the api
+
+        AccountResponse expectedResponse = AccountResponse.
+                builder().
+                firstName(testRequest.getFirstName()).
+                middleName(testRequest.getMiddleName()).
+                lastName(testRequest.getLastName()).
+                email(testRequest.getEmail()).
+                accountNumber(testRequest.getAccountNumber()).
+                mobileNumber(testRequest.getMobileNumber()).
+                dateOfBirth(testRequest.getDateOfBirth()).
+                build();
+        String formattedJson = objectMapper.writeValueAsString(testRequest);
+        String message = "account number : " + accountNumber + " and email : " + email + "not found. Please try with a valid account number and email.";
+        //Act and Assert
+        when(accountService.UpdateAccountDetails
+                (any(AccountRequest.class),eq(accountNumber),eq(email))).
+                thenThrow(new UserNotFoundException(message))  ;
+        mockMvc.perform(put("/api/v1/accounts/{accountNumber}/{email}",accountNumber,email).
+                contentType(MediaType.APPLICATION_JSON)
+                .content(formattedJson)).
+                andExpect(status().isNotFound()).
+                andExpect(jsonPath("$.message").value("Resource Not Found"))
+                .andExpect(jsonPath("$.errors[0]").value(message)).
+                andDo(print());
+
+
+        //verify there is on interaction
+        verify(accountService,times(1)).
+                UpdateAccountDetails(any(AccountRequest.class),eq(accountNumber),eq(email));
+
+
     }
 
 }
