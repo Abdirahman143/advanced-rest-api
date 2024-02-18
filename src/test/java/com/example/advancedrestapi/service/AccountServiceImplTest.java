@@ -1,6 +1,7 @@
 package com.example.advancedrestapi.service;
 
 import com.example.advancedrestapi.controller.TestDataProvider;
+import com.example.advancedrestapi.customException.UserNotFoundException;
 import com.example.advancedrestapi.mapper.AccountResponseMapper;
 import com.example.advancedrestapi.model.Account;
 import com.example.advancedrestapi.repository.AccountRepository;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
@@ -130,7 +132,44 @@ class AccountServiceImplTest {
     }
 
     @Test
-    void findAccountDetails() {
+    @DisplayName("Verify find account details should return account response")
+    @Order(3)
+    void findAccountDetails_ShouldReturnAccountResponse() {
+        // Given
+        String accountNumber = "123456789";
+        String email = "john.smith@example.com";
+        Account testAccount = TestDataDriver.createTestAccount();
+        when(accountRepository.findAccountDetails(accountNumber, email)).thenReturn(Optional.of(testAccount));
+
+        // When
+        Optional<AccountResponse> optionalAccountResponse = accountService.findAccountDetails(accountNumber, email);
+
+        // Then
+         assertThat(optionalAccountResponse).isPresent();
+        AccountResponse accountResponse = optionalAccountResponse.get();
+        assertThat(accountResponse.getFirstName()).isEqualTo(testAccount.getFirstName());
+        assertThat(accountResponse.getEmail()).isEqualTo(testAccount.getEmail());
+        assertThat(accountResponse.getAccountNumber()).isEqualTo(testAccount.getAccountNumber());
+        assertThat(accountResponse.getMobileNumber()).isEqualTo(testAccount.getMobileNumber());
+
+
+    }
+
+    @Test
+    @DisplayName("Verify find account details with invalid account should throw exception")
+    @Order(4)
+    void findAccountDetails_WithInvalidAccount_ShouldThrowUserNotFoundException() {
+        // Given
+        String accountNumber = "invalidAccount";
+        String email = "invalidEmail";
+
+        // When
+        when(accountRepository.findAccountDetails(accountNumber, email)).thenReturn(Optional.empty());
+
+        // Then
+        assertThrows(UserNotFoundException.class, () -> {
+            accountService.findAccountDetails(accountNumber, email);
+        });
     }
 
     @Test
