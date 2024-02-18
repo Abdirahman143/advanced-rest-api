@@ -153,6 +153,10 @@ class AccountServiceImplTest {
         assertThat(accountResponse.getMobileNumber()).isEqualTo(testAccount.getMobileNumber());
 
 
+        //verify
+        verify(accountRepository).findAccountDetails(accountNumber,email);
+
+
     }
 
     @Test
@@ -170,12 +174,59 @@ class AccountServiceImplTest {
         assertThrows(UserNotFoundException.class, () -> {
             accountService.findAccountDetails(accountNumber, email);
         });
+
+        //verify
+        verify(accountRepository).findAccountDetails(accountNumber,email);
     }
 
     @Test
-    void updateAccountDetails() {
+    @DisplayName("Verify update account details should return updated account response")
+    @Order(5)
+    void updateAccountDetails_ShouldReturnUpdatedAccountResponse() {
+        // Given
+        String accountNumber = "123456789";
+        String email = "john.smith@example.com";
+        AccountRequest updatedAccountRequest = TestDataDriver.createTestAccountRequest();
+        Account existingAccount = TestDataDriver.createTestAccount();
+        when(accountRepository.findAccountDetails(accountNumber, email)).thenReturn(Optional.of(existingAccount));
+        when(accountRepository.save(any(Account.class))).thenReturn(existingAccount);
+        // When
+        ResponseEntity<AccountResponse> responseEntity = accountService.UpdateAccountDetails(updatedAccountRequest, accountNumber, email);
+
+        // Then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        AccountResponse updatedAccountResponse = responseEntity.getBody();
+        assertThat(updatedAccountResponse).isNotNull();
+        assertThat(updatedAccountResponse.getFirstName()).isEqualTo(updatedAccountRequest.getFirstName());
+        assertThat(updatedAccountResponse.getMiddleName()).isEqualTo(updatedAccountRequest.getMiddleName());
+        assertThat(updatedAccountResponse.getMobileNumber()).isEqualTo(updatedAccountRequest.getMobileNumber());
+        assertThat(updatedAccountResponse.getDateOfBirth()).isEqualTo(updatedAccountRequest.getDateOfBirth());
+
+        //verify
+        verify(accountRepository,times(1)).save(any(Account.class));
+        verify(accountRepository,times(1)).findAccountDetails(accountNumber,email);
+
     }
 
+    @Test
+    @DisplayName("Verify update account details with invalid account should throw exception")
+    @Order(6)
+    void updateAccountDetails_WithInvalidAccount_ShouldThrowUserNotFoundException() {
+        // Given
+        String accountNumber = "invalidAccount";
+        String email = "invalidEmail";
+        AccountRequest updatedAccountRequest = TestDataDriver.createTestAccountRequest();
+        when(accountRepository.findAccountDetails(accountNumber, email)).thenReturn(Optional.empty());
+
+        // When, Then
+        assertThrows(UserNotFoundException.class, () -> {
+            accountService.UpdateAccountDetails(updatedAccountRequest, accountNumber, email);
+        });
+
+        //verify
+        verify(accountRepository,times(1)).findAccountDetails(accountNumber,email);
+        verify(accountRepository,never()).save(any(Account.class));
+    }
 
     @Test
     void updateAccountDetailsPartially() {
