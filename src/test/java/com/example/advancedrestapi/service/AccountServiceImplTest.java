@@ -30,13 +30,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-
-import org.springframework.http.ResponseEntity;
-import static org.assertj.core.api.ClassBasedNavigableIterableAssert.assertThat;
-
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doReturn;
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AccountServiceImplTest {
@@ -278,6 +272,23 @@ class AccountServiceImplTest {
     }
 
     @Test
-    void deleteAccountDetails() {
+    @DisplayName("Verify delete account should return success message")
+    @Order(9)
+    void deleteAccountDetails_ShouldReturnSuccessMessage() {
+        // Given
+        String accountNumber = "123456789";
+        String email = "john.smith@example.com";
+        Account existingAccount = TestDataDriver.createTestAccount();
+        when(accountRepository.findAccountDetails(accountNumber, email)).thenReturn(Optional.of(existingAccount));
+
+        // When
+        ResponseEntity<String> responseEntity = accountService.deleteAccountDetails(accountNumber, email);
+
+        // Then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody()).isEqualTo("Account with account number " + accountNumber + " has been permanently deleted.");
+
+        // Verify that deleteByAccountNumber method is called
+        verify(accountRepository, times(1)).deleteByAccountNumber(accountNumber);
     }
 }
