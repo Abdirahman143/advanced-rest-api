@@ -5,6 +5,7 @@ import com.example.advancedrestapi.customException.UserNotFoundException;
 import com.example.advancedrestapi.mapper.AccountResponseMapper;
 import com.example.advancedrestapi.model.Account;
 import com.example.advancedrestapi.repository.AccountRepository;
+import com.example.advancedrestapi.request.AccountPartialUpdateRequest;
 import com.example.advancedrestapi.request.AccountRequest;
 import com.example.advancedrestapi.response.AccountResponse;
 import org.junit.jupiter.api.*;
@@ -229,7 +230,51 @@ class AccountServiceImplTest {
     }
 
     @Test
-    void updateAccountDetailsPartially() {
+    @DisplayName("Verify partial update account details should return updated account response")
+    @Order(7)
+    void updateAccountDetailsPartially_ShouldReturnUpdatedAccountResponse() {
+        // Given
+        String accountNumber = "123456789";
+        String email = "john.smith@example.com";
+        AccountPartialUpdateRequest partialUpdateRequest = TestDataDriver.createPartialUpdateRequest();
+        Account existingAccount = TestDataDriver.createTestAccount();
+        when(accountRepository.findAccountDetails(accountNumber, email)).thenReturn(Optional.of(existingAccount));
+        when(accountRepository.save(any(Account.class))).thenReturn(existingAccount);
+
+        // When
+        ResponseEntity<AccountResponse> responseEntity = accountService.updateAccountDetailsPartially(partialUpdateRequest, accountNumber, email);
+
+        // Then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        AccountResponse updatedAccountResponse = responseEntity.getBody();
+        assertThat(updatedAccountResponse).isNotNull();
+        assertThat(updatedAccountResponse.getMobileNumber()).isEqualTo(partialUpdateRequest.getMobileNumber());
+        assertThat(updatedAccountResponse.getDateOfBirth()).isEqualTo(partialUpdateRequest.getDateOfBirth());
+
+        //verify
+        verify(accountRepository).findAccountDetails(accountNumber,email);
+        verify(accountRepository,times(1)).save(any(Account.class));
+
+    }
+
+    @Test
+    @DisplayName("Verify partial update account details with invalid account should throw exception")
+    @Order(8)
+    void updateAccountDetailsPartially_WithInvalidAccount_ShouldThrowUserNotFoundException() {
+        // Given
+        String accountNumber = "invalidAccount";
+        String email = "invalidEmail";
+        AccountPartialUpdateRequest partialUpdateRequest = TestDataDriver.createPartialUpdateRequest();
+        when(accountRepository.findAccountDetails(accountNumber, email)).thenReturn(Optional.empty());
+
+        // When, Then
+        assertThrows(UserNotFoundException.class, () -> {
+            accountService.updateAccountDetailsPartially(partialUpdateRequest, accountNumber, email);
+        });
+
+        //verify
+        verify(accountRepository,never()).save(any(Account.class));
+        verify(accountRepository,times(1)).findAccountDetails(accountNumber,email);
     }
 
     @Test

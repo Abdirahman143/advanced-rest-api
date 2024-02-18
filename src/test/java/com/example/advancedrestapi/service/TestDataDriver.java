@@ -1,6 +1,7 @@
 package com.example.advancedrestapi.service;
 
 import com.example.advancedrestapi.model.Account;
+import com.example.advancedrestapi.request.AccountPartialUpdateRequest;
 import com.example.advancedrestapi.request.AccountRequest;
 import com.example.advancedrestapi.response.AccountResponse;
 
@@ -109,4 +110,16 @@ public class TestDataDriver {
                         .build())
                 .collect(Collectors.toList());
     }
-}
+
+  public static AccountPartialUpdateRequest createPartialUpdateRequest() {
+
+            LocalDate localDateOfBirth = LocalDate.now().minusYears(25);
+            Date dateOfBirth = Date.from(localDateOfBirth.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+            AccountPartialUpdateRequest partialUpdateRequest = new AccountPartialUpdateRequest();
+            partialUpdateRequest.setMobileNumber("9876543210");
+            partialUpdateRequest.setDateOfBirth(dateOfBirth);
+            return partialUpdateRequest;
+        }
+    }
+
